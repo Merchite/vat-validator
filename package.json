@@ -1,0 +1,23 @@
+{
+  "name": "vat-validator",
+  "version": "1.0.0",
+  "main": "web/index.js",
+  "license": "UNLICENSED",
+  "scripts": {
+    "shopify": "shopify",
+    "build": "shopify app build",
+    "dev": "shopify app dev",
+    "info": "shopify app info",
+    "generate": "shopify app generate",
+    "deploy": "shopify app deploy",
+    "fly": "flyctl deploy --build-arg SHOPIFY_API_KEY=25dd90b60e6506dcb9c5aedf271f1422 --remote-only"
+  },
+  "dependencies": {
+    "@shopify/app": "^3.46.0",
+    "@shopify/checkout-ui-extensions-react": "^0.26.2",
+    "@shopify/cli": "^3.46.0",
+    "http-proxy-middleware": "^2.0.6",
+    "react": "^17.0.2"
+  },
+  "author": "ben"
+}

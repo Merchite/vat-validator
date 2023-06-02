@@ -1,0 +1,16 @@
+{
+  "business_header": "Zakelijk",
+  "business_user": "Ik ben een zakelijke gebruiker",
+  "vat": "BTW nummer",
+  "invoice_mail": "Factuur mail",
+  "reference": "Referentie",
+  "login_required": "Log in om BTW vrij te bestellen",
+  "login": "Inloggen",
+  "error_format": "Voer een correct geformatteerd BTW nummer in.",
+  "error_invalid": "Ongeldig BTW nummer.",
+  "error_company_name": "De bedrijfsnaam in uw BTW nummer komt niet overeen met de bedrijfsnaam in uw adres.",
+  "error_valid_native": "Geldig BTW nummer, maar u bent niet gemachtigd om BTW vrij te bestellen.",
+  "error_technical": "Er is een fout opgetreden tijdens het valideren van uw BTW nummer.",
+  "error_login": "Log in of maak een account aan om BTW vrij te bestellen.",
+  "error_mail": "Voer een geldig e-mailadres in."
+}

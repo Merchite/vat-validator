@@ -1,0 +1,16 @@
+{
+  "business_header": "Business",
+  "business_user": "I'm a business user",
+  "vat": "VAT number",
+  "invoice_mail": "Invoice mail",
+  "reference": "Reference",
+  "login_required": "Login required to order tax exempt",
+  "login": "Login",
+  "error_format": "Please enter a correctly formatted VAT number.",
+  "error_invalid": "Invalid VAT number.",
+  "error_company_name": "The company name in your VAT number does not match the company name in your address.",
+  "error_valid_native": "Valid VAT number, but you are not allowed to order tax exempt.",
+  "error_technical": "An error occurred while validating your VAT number.",
+  "error_login": "Please login or create an account to order tax exempt.",
+  "error_mail": "Please enter a valid email address."
+}

@@ -1,0 +1,16 @@
+{
+  "business_header": "Business",
+  "business_user": "Je suis un utilisateur business",
+  "vat": "Numéro de TVA",
+  "invoice_mail": "Mail de facturation",
+  "reference": "Référence",
+  "login_required": "Vous devez être connecté pour commander sans TVA.",
+  "login": "Se connecter",
+  "error_format": "Veuillez entrer un numéro de TVA correctement formaté.",
+  "error_invalid": "Numéro de TVA invalide.",
+  "error_company_name": "Le nom de l'entreprise dans votre numéro de TVA ne correspond pas au nom de l'entreprise dans votre adresse.",
+  "error_valid_native": "Numéro de TVA valide, mais vous n'êtes pas autorisé à commander sans TVA.",
+  "error_technical": "Une erreur est survenue lors de la validation de votre numéro de TVA.",
+  "error_login": "Veuillez vous connecter ou créer un compte pour commander sans TVA.",
+  "error_mail": "Veuillez entrer une adresse email valide."
+}
