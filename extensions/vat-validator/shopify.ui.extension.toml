@@ -22,6 +22,11 @@ extension_points = [
 #   description = "Enter a title for the banner"
 
 [capabilities]
-network_access = true
-block_progress = true
-api_access = true
+  network_access = true
+  block_progress = true
+  api_access = true
+
+[ui.paths]
+  getCustomer = "/get/customer/:customerId/"
+  mutateCustomer = "/mutate/customer/:customerId/"
+  validateVatNumber = "/validate/vat/:vatNumber/"
