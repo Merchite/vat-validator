@@ -2,6 +2,8 @@
   "business_header": "Business",
   "business_user": "I'm a business user",
   "vat": "VAT number",
+  "required": "(Required)",
+  "optional": "(Optional)",
   "invoice_mail": "Invoice mail",
   "reference": "Reference",
   "login_required": "Login required to order tax exempt",

@@ -2,6 +2,8 @@
   "business_header": "Business",
   "business_user": "Je suis un utilisateur business",
   "vat": "Numéro de TVA",
+  "required": "(Requis)",
+  "optional": "(Optionnel)",
   "invoice_mail": "Mail de facturation",
   "reference": "Référence",
   "login_required": "Vous devez être connecté pour commander sans TVA.",

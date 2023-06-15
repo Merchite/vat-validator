@@ -2,6 +2,8 @@
   "business_header": "Zakelijk",
   "business_user": "Ik ben een zakelijke gebruiker",
   "vat": "BTW nummer",
+  "required": "(Verplicht)",
+  "optional": "(Optioneel)",
   "invoice_mail": "Factuur mail",
   "reference": "Referentie",
   "login_required": "Log in om BTW vrij te bestellen",

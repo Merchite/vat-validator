@@ -52,6 +52,7 @@ function App() {
   const [fullVatNumber, setFullVatNumber] = useState('');
   const [isValidRegex, setIsValidRegex] = useState(false);
   const [vatValidationError, setVatValidationError] = useState('');
+  const [nativeError, setNativeError] = useState('');
   const [isValid, setIsValid] = useState(false);
   const [isTaxExempt, setIsTaxExempt] = useState(false);
   const [vatNumberValidated, setVatNumberValidated] = useState(false);
@@ -85,9 +86,9 @@ function App() {
       });
       if (!response.ok) throw new Error(translate('error_technical'));
       const data = await response.json();
-      debug ? console.log("Data: ", data) : null;
+      debug ? console.log("Getting customer data: ", data) : null;
       if (data.data.customer.metafield) {
-        console.log("Found VAT number: ", data.data.customer.metafield.value);
+        console.log("Found existing VAT number: ", data.data.customer.metafield.value);
         setBusinessUser(data.data.customer.metafield.value !== '' ? true : false)
         setFullVatNumber(data.data.customer.metafield.value);
         setCustomerSavedVatNumber(data.data.customer.metafield.value);
@@ -95,36 +96,38 @@ function App() {
         setCustomerTaxExempt(data.data.customer.taxExempt);
       }
     } catch (e) {
-      debug ? console.log(e) : null;
+      debug ? console.log("Error while getting customer data", e) : null;
     }
   };
 
-  const validateVatNumber = async () => {
+  const validateVatNumber = async (vatNumber) => {
     setVatNumberValidated(false);
     const apiKey = getApiConfig(`https://${myshopifyDomain}/`);
-    const apiUrl = `https://apilayer.net/api/validate?access_key=${apiKey}&vat_number=${fullVatNumber}`;
+    const apiUrl = `https://apilayer.net/api/validate?access_key=${apiKey}&vat_number=${vatNumber}`;
     try {
       const response = await fetch(apiUrl);
       if (!response.ok) throw new Error(translate('error_technical'));
       const data = await response.json();
-      debug ? console.log("VAT validation response: ", data) : null;
+      debug ? console.log("Data from VAT validation: ", data) : null;
       const isCompanyNameMatch = companyNamesMatch(address.company, data.company_name);
-      debug ? console.log("Company name match: ", isCompanyNameMatch) : null;
-      if (data.valid && isCompanyNameMatch) {
-        setIsValid(true);
-        if (address.countryCode !== 'NL') {
-          setIsTaxExempt(true);
-        } else if (address.countryCode === 'NL') {
-          setIsTaxExempt(false);
-          setVatValidationError(translate('error_valid_native'));
-        }
-      }
-      if (!data.valid) {
-        throw new Error(translate('error_invalid'));
-      }
-      if (!isCompanyNameMatch) {
-        throw new Error(translate('error_company_name'));
-      }
+      debug ? console.log("Do company names match? ", isCompanyNameMatch) : null;
+      data.valid
+        ? isCompanyNameMatch
+          ? (
+              debug ? console.log("Company names match, VAT number is valid") : null,
+              setIsValid(true),
+              address.countryCode !== 'NL'
+                ? debug ? console.log("Not native, is tax exempt") : null && setIsTaxExempt(true)
+                : debug ? console.log("Native, is not tax exempt") : null && setIsTaxExempt(false) && setNativeError(true)
+            )
+          : (
+              setVatValidationError(translate('error_company_name')),
+              debug ? console.log("Company names don't match, VAT number is invalid") : null
+            )
+        : (
+            debug ? console.log("VAT number is not valid") : null,
+            setVatValidationError(translate('error_invalid'))
+          );
     } catch (e) {
       setVatValidationError(e.message || translate('error_technical'));
     } finally {
@@ -189,9 +192,9 @@ function App() {
         body: JSON.stringify({ query: mutation }),
       });
       const data = await response.json();
-      debug ? console.log('Data: ', data) : null;
+      debug ? console.log('Updated customer data:', data) : null;
     } catch (error) {
-      debug ? console.error(error) : null;
+      debug ? console.error("Error while updating customer", error) : null;
     }
   };
 
@@ -202,43 +205,47 @@ function App() {
   }, []);
 
   useEffect(() => {
+    debug ? console.log(`VAT number ${fullVatNumber} regex validation changed to: ${isValidRegex}`) : null;
     if (isValidRegex) {
       setVatValidationError('');
-      if (address.company !== '') {
-        if (fullVatNumber !== customerSavedVatNumber || isTaxExempt !== customerTaxExempt) {
-          validateVatNumber();
-        }
-      }
-      debug ? console.log("Validate VAT number: ", fullVatNumber) : null;
+      address.company
+        ? fullVatNumber !== customerSavedVatNumber
+          ? (
+              debug ? console.log("Has company name, starting VAT number validation") : null,
+              validateVatNumber(fullVatNumber)
+            )
+          : debug ? console.log("Stored VAT number and input VAT number are the same, skipping VAT number validation") : null
+        : debug ? console.log("Company name is empty, skipping VAT number validation") : null;
     }
   }, [isValidRegex, address.company]);
-
-  customer
+  
+  useEffect(() => {
+    if (customerSavedVatNumber !== '') {
+      debug ? console.log(`Stored VAT number changed, starting to validate: ${customerSavedVatNumber}. Customer is tax exempt: ${customerTaxExempt}`) : null;
+      validateVatNumber(customerSavedVatNumber);
+    }
+  }, [customerSavedVatNumber]);
 
   useEffect(() => {
-    debug ? console.log(
-      "VAT number validated:",
-      fullVatNumber,
-      "Is valid:",
-      isValid,
-      "Is tax exempt:",
-      isTaxExempt
-    ) : null;
-    if (!isValid && fullVatNumber !== '') setVatValidationError(translate('error_invalid'));
-    debug ? console.log("Tax exempt?", isTaxExempt) : null;
+    debug ? console.log("VAT number is validated:", fullVatNumber, "Is valid:", isValid, "Is tax exempt:", isTaxExempt, "customerTaxExempt:", customerTaxExempt) : null;
     if (vatNumberValidated && customer) {
-      if (fullVatNumber !== customerSavedVatNumber) {
+      if (fullVatNumber === customerSavedVatNumber) {
+        updateCustomer(customer.id, isTaxExempt);
+      } else {
         updateCustomer(customer.id, isTaxExempt, fullVatNumber, invoiceMail);
       }
     }
   }, [vatNumberValidated]);
 
   useEffect(() => {
+    debug ? console.log("Business user changed:", businessUser) : null;
     if (!businessUser && customerSavedVatNumber !== '') {
+      debug ? console.log("Business user without vat number, going to update customer:", customerSavedVatNumber) : null;
       updateCustomer(customer.id, false);
     }
     if (businessUser && customerSavedVatNumber !== '' || isTaxExempt !== customerTaxExempt) {
-      validateVatNumber();
+      debug ? console.log("Going to validate VAT number:", customerSavedVatNumber) : null;
+      setIsValidRegex(vatNumberPattern.test(customerSavedVatNumber));
     }
   }, [businessUser]);
   
@@ -252,6 +259,7 @@ function App() {
   }, [invoiceMail]);
 
   useBuyerJourneyIntercept(({ canBlockProgress }) => {
+    debug ? console.log("Can block progress?", canBlockProgress, "Regex", isValidRegex, "Vat number", fullVatNumber) : null;
     if (canBlockProgress && !isValidRegex && fullVatNumber !== '') {
       return {
         behavior: 'block',
@@ -277,7 +285,7 @@ function App() {
       },
     };
   });
-
+  
   return (
     <>
       <BlockStack border="base" padding="base" cornerRadius="large">
@@ -309,15 +317,25 @@ function App() {
               <>
                 <Text
                   size="medium"
-                  appearance='warning'
+                  appearance='accent'
                 >
                   {translate('login_required')}
                 </Text>
               </>
             )}
+            {nativeError && (
+              <>
+                <Text
+                  size="medium"
+                  appearance='success'
+                >
+                  {translate('error_valid_native')}
+                </Text>
+              </>
+            )}
             <TextField
               icon="email"
-              label={translate("invoice_mail")}
+              label={translate("invoice_mail") + " " + translate("optional")}
               type="single_line_text_field"
               value={invoiceMail}
               onChange={handleInvoiceMailChange}
@@ -325,7 +343,7 @@ function App() {
             />
             <TextField
               icon="note"
-              label={translate("reference")}
+              label={translate("reference") + " " + translate("optional")}
               type="single_line_text_field"
               value={reference}
               onChange={handleReferenceChange}
